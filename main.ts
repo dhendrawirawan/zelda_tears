@@ -14,8 +14,13 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         )
     })
 })
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile`, function (sprite, location) {
+    Link.ay = 50
+    controller.moveSprite(Link, 50, 0)
+    Link_jump_speed = -50
+})
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    Link.vy = -100
+    Link.vy = Link_jump_speed
 })
 function Intro_Screen () {
     sprites.destroy(Link_Intro)
@@ -226,13 +231,20 @@ function Intro_Screen () {
     )
     Link.ay = 250
     Link.setStayInScreen(true)
+    Link_jump_speed = -100
     scene.cameraFollowSprite(Link)
     controller.moveSprite(Link, 100, 0)
     tiles.placeOnTile(Link, tiles.getTileLocation(0, 10))
 }
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.hazardWater, function (sprite, location) {
+    Link.ay = 250
+    controller.moveSprite(Link, 100, 0)
+    Link_jump_speed = -100
+})
+let Link_jump_speed = 0
 let Link: Sprite = null
 let Link_Intro: Sprite = null
-timer.after(5, function () {
+timer.after(5500, function () {
     Intro_Screen()
 })
 scene.setBackgroundColor(15)
