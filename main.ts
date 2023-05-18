@@ -346,7 +346,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
     if (Attack_mode == 1) {
         sprites.destroy(otherSprite)
     } else {
-        sprites.destroy(sprite)
+    	
     }
 })
 let Skeleton: Sprite = null
