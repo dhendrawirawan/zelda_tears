@@ -1,28 +1,91 @@
+namespace SpriteKind {
+    export const Weapon = SpriteKind.create()
+}
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     Attack_mode = 1
-    animation.runImageAnimation(
-    Link,
-    assets.animation`Link_attack`,
-    150,
-    false
-    )
-    timer.after(500, function () {
+    if (Link_direction_right == 1) {
         animation.runImageAnimation(
         Link,
-        assets.animation`Link_walk_right`,
-        200,
-        true
+        assets.animation`Link_attack`,
+        150,
+        false
         )
-        Attack_mode = 0
-    })
+        timer.after(500, function () {
+            animation.runImageAnimation(
+            Link,
+            assets.animation`Link_walk_right`,
+            200,
+            true
+            )
+            Attack_mode = 0
+        })
+        if (Link_Has_Bow_Arrow == 1) {
+            projectile = sprites.createProjectileFromSprite(img`
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                2 . . . . . . . . . . . . . 2 . 
+                . 5 5 5 5 5 5 5 5 5 5 5 5 5 5 2 
+                2 . . . . . . . . . . . . . 2 . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                `, Link, 150, 0)
+        }
+    } else {
+        animation.runImageAnimation(
+        Link,
+        assets.animation`Link_attack_left`,
+        150,
+        false
+        )
+        timer.after(500, function () {
+            animation.runImageAnimation(
+            Link,
+            assets.animation`Link_walk_left`,
+            200,
+            true
+            )
+            Attack_mode = 0
+        })
+        if (Link_Has_Bow_Arrow == 1) {
+            projectile = sprites.createProjectileFromSprite(img`
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . 2 . . . . . . . . . . . . . 2 
+                2 5 5 5 5 5 5 5 5 5 5 5 5 5 5 . 
+                . 2 . . . . . . . . . . . . . 2 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                `, Link, -150, 0)
+        }
+    }
 })
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile`, function (sprite, location) {
     Link.ay = 50
     controller.moveSprite(Link, 50, 0)
-    Link_jump_speed = -50
+    Link_jump_speed = -100
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    Link.vy = Link_jump_speed
+    if (Link.vy == 0) {
+        Link.vy = Link_jump_speed
+    }
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     Link.setImage(assets.image`Link_face_left`)
@@ -32,8 +95,10 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     200,
     true
     )
+    Link_direction_right = 0
 })
 function Intro_Screen () {
+    info.setLife(5)
     sprites.destroy(Link_Intro)
     tiles.setCurrentTilemap(tilemap`level1`)
     scene.setBackgroundImage(img`
@@ -240,12 +305,33 @@ function Intro_Screen () {
     200,
     true
     )
+    Link_direction_right = 1
     Link.ay = 250
     Link.setStayInScreen(true)
-    Link_jump_speed = -100
+    Link_jump_speed = -150
     scene.cameraFollowSprite(Link)
     controller.moveSprite(Link, 100, 0)
     tiles.placeOnTile(Link, tiles.getTileLocation(0, 10))
+    Bow_Arrow = sprites.create(img`
+        ......2..444........
+        .....252.1..444.....
+        ..2...5..1.....44...
+        .252..5..1.......4..
+        ..5...5..1.......4..
+        ..5...5..1.......4..
+        ..5...5..1........4.
+        ..5...5..1........4.
+        ..5...5..1........4.
+        ..5...5..1.......4..
+        ..5...5..1.......4..
+        ..5...5..1.......4..
+        ..5..2.2.1......4...
+        ..5......1....44....
+        .2.2.....1..44......
+        .........444........
+        `, SpriteKind.Weapon)
+    tiles.placeOnTile(Bow_Arrow, tiles.getTileLocation(52, 13))
+    Link_Has_Bow_Arrow = 0
     Bat = sprites.create(img`
         . . f f f . . . . . . . . . . . 
         f f f c c . . . . . . . . f f f 
@@ -264,8 +350,28 @@ function Intro_Screen () {
         . . . f f f f f f f . . . . . . 
         . . . . . . . . . . . . . . . . 
         `, SpriteKind.Enemy)
-    tiles.placeOnRandomTile(Bat, sprites.builtin.forestTiles10)
+    Bat2 = sprites.create(img`
+        . . f f f . . . . . . . . . . . 
+        f f f c c . . . . . . . . f f f 
+        f f c c c . c c . . . f c b b c 
+        f f c 3 c c 3 c c f f b b b c . 
+        f f c 3 b c 3 b c f b b c c c . 
+        f c b b b b b b c f b c b c c . 
+        c c 1 b b b 1 b c b b c b b c . 
+        c b b b b b b b b b c c c b c . 
+        c b 1 f f 1 c b b c c c c c . . 
+        c f 1 f f 1 f b b b b f c . . . 
+        f f f f f f f b b b b f c . . . 
+        f f 2 2 2 2 f b b b b f c c . . 
+        . f 2 2 2 2 2 b b b c f . . . . 
+        . . f 2 2 2 b b b c f . . . . . 
+        . . . f f f f f f f . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.Enemy)
+    tiles.placeOnRandomTile(Bat, assets.tile`myTile0`)
+    tiles.placeOnRandomTile(Bat2, assets.tile`myTile1`)
     Bat.follow(Link, 50)
+    Bat2.follow(Link, 50)
     Skeleton = sprites.create(img`
         ........................
         ........................
@@ -292,8 +398,64 @@ function Intro_Screen () {
         ........................
         ........................
         `, SpriteKind.Enemy)
-    tiles.placeOnRandomTile(Skeleton, sprites.castle.rock0)
+    Skeleton2 = sprites.create(img`
+        ........................
+        ........................
+        ........................
+        ........................
+        .........fffff..........
+        ........f11111ff........
+        .......fb111111bf.......
+        .......f1111111dbf......
+        ......fd111111dddf......
+        ......fd13111ddddf......
+        ......fd11dddddddf......
+        ......f111dddddddf......
+        ......f11fcddddddf......
+        .....fb1111bdddbf.......
+        .....f1b1bdfcfff........
+        .....fbfbffffffff.......
+        ......fffffffffff.ff....
+        ...........ffffffff.....
+        ........f1b1bffffff.....
+        ........fbfbffffff......
+        ........................
+        ........................
+        ........................
+        ........................
+        `, SpriteKind.Enemy)
+    Skeleton3 = sprites.create(img`
+        ........................
+        ........................
+        ........................
+        ........................
+        .........fffff..........
+        ........f11111ff........
+        .......fb111111bf.......
+        .......f1111111dbf......
+        ......fd111111dddf......
+        ......fd13111ddddf......
+        ......fd11dddddddf......
+        ......f111dddddddf......
+        ......f11fcddddddf......
+        .....fb1111bdddbf.......
+        .....f1b1bdfcfff........
+        .....fbfbffffffff.......
+        ......fffffffffff.ff....
+        ...........ffffffff.....
+        ........f1b1bffffff.....
+        ........fbfbffffff......
+        ........................
+        ........................
+        ........................
+        ........................
+        `, SpriteKind.Enemy)
+    tiles.placeOnRandomTile(Skeleton, sprites.swamp.swampTile3)
+    tiles.placeOnRandomTile(Skeleton2, sprites.castle.rock0)
+    tiles.placeOnRandomTile(Skeleton3, sprites.castle.saplingPine)
     Skeleton.follow(Link, 50)
+    Skeleton2.follow(Link, 50)
+    Skeleton3.follow(Link, 50)
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     Link.setImage(img`
@@ -336,23 +498,38 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     200,
     true
     )
+    Link_direction_right = 1
 })
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.hazardWater, function (sprite, location) {
     Link.ay = 250
     controller.moveSprite(Link, 100, 0)
-    Link_jump_speed = -100
+    Link_jump_speed = -150
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Weapon, function (sprite, otherSprite) {
+    sprites.destroy(otherSprite, effects.none, 500)
+    music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.InBackground)
+    Link_Has_Bow_Arrow = 1
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     if (Attack_mode == 1) {
         sprites.destroy(otherSprite)
+        info.changeScoreBy(1)
     } else {
-    	
+        info.changeLifeBy(-1)
+        pause(1000)
     }
 })
+let Skeleton3: Sprite = null
+let Skeleton2: Sprite = null
 let Skeleton: Sprite = null
+let Bat2: Sprite = null
 let Bat: Sprite = null
+let Bow_Arrow: Sprite = null
 let Link_jump_speed = 0
+let projectile: Sprite = null
+let Link_Has_Bow_Arrow = 0
 let Link: Sprite = null
+let Link_direction_right = 0
 let Attack_mode = 0
 let Link_Intro: Sprite = null
 timer.after(5500, function () {
@@ -364,13 +541,14 @@ controller.moveSprite(Link_Intro)
 Link_Intro.setPosition(75, 10)
 Link_Intro.setVelocity(0, 40)
 forever(function () {
-    music.play(music.createSong(hex`0078000408040100001c00010a006400f401640000040000000000000000000000000005000004780000000400011e04000800012208000c00012410001400011e14001800012218001c00012420002400011e24002800012228002c0001242c003000012930003400012738003c0001243c004000012540004400012444004800012048004c00011d5c006000011b60006400011d64006800012068006c00011d`), music.PlaybackMode.UntilDone)
-    music.play(music.createSong(hex`0078000408040100001c00010a006400f401640000040000000000000000000000000005000004780000000400011e04000800012208000c00012410001400011e14001800012218001c00012420002400011e24002800012228002c0001242c003000012930003400012738003c0001243c004000012540004400012944004800012548004c0001205c006000011b60006400011d64006800012068006c00011d`), music.PlaybackMode.UntilDone)
-    music.play(music.createSong(hex`0078000408040100001c00010a006400f4016400000400000000000000000000000000050000046c0000000400011b04000800011d08000c00011e10001400012014001800012218001c00012420002400012524002800012428002c00011d40004400011b44004800011d48004c00011e50005400012054005800012258005c00012460006400012564006800012768006c000129`), music.PlaybackMode.UntilDone)
-    music.play(music.createSong(hex`0078000408040100001c00010a006400f401640000040000000000000000000000000005000004960000000400011b04000800011d08000c00011e10001400012014001800012218001c00012420002400012524002800012428002c00011d40004400011b44004800011948004c00011d4c005000011b50005400011e54005800011d58005c0001225c006000012060006400012464006800012268006c0001256c007000012470007400012774007800012578007c0001297c008000012a`), music.PlaybackMode.UntilDone)
-    music.play(music.createSong(hex`0078000408040100001c00010a006400f401640000040000000000000000000000000005000004720000000400012910001400012920002400012924002800012928002c0001292c003000012930003400012940004400012248004c0001224c005000012250005400012458005c0001245c006000012460006400012268006c0001226c007000012270007400012778007c0001277c0080000127`), music.PlaybackMode.UntilDone)
-    music.play(music.createSong(hex`0078000408040100001c00010a006400f401640000040000000000000000000000000005000004900000000400012908000c0001290c001000012910001400012518001c0001251c002000012520002400012028002c0001202c003000012030003400011d38003c00011d3c004000011d40004400012248004c0001224c005000012250005400012458005c0001245c006000012460006400012268006c0001226c007000012270007400012778007c0001277c0080000127`), music.PlaybackMode.UntilDone)
-    music.play(music.createSong(hex`0078000408020100001c00010a006400f4016400000400000000000000000000000000050000043c0000000400012908000c0001290c001000012910001400012518001c0001251c002000012520002400012028002c0001202c003000012030003400011d`), music.PlaybackMode.UntilDone)
-    music.play(music.createSong(hex`0078000408040100001c00010a006400f4016400000400000000000000000000000000050000046c0000000400011b04000800011d08000c00011e10001400012014001800012218001c00012420002400012524002800012428002c00011d40004400011b44004800011d48004c00011e50005400012054005800012258005c00012460006400012564006800012768006c000129`), music.PlaybackMode.UntilDone)
-    music.play(music.createSong(hex`0078000408040100001c00010a006400f401640000040000000000000000000000000005000004960000000400011b04000800011d08000c00011e10001400012014001800012218001c00012420002400012524002800012428002c00011d40004400011b44004800011948004c00011d4c005000011b50005400011e54005800011d58005c0001225c006000012060006400012464006800012268006c0001256c007000012470007400012774007800012578007c0001297c008000012a`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408040200001c00010a006400f401640000040000000000000000000000000005000004780000000400011e04000800012208000c00012410001400011e14001800012218001c00012420002400011e24002800012228002c0001242c003000012930003400012738003c0001243c004000012540004400012444004800012048004c00011d5c006000011b60006400011d64006800012068006c00011d03001c0001dc00690000045e01000400000000000000000000056400010400030c0000004000011e40008000011d`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408040200001c00010a006400f401640000040000000000000000000000000005000004780000000400011e04000800012208000c00012410001400011e14001800012218001c00012420002400011e24002800012228002c0001242c003000012930003400012738003c0001243c004000012540004400012944004800012548004c0001205c006000011b60006400011d64006800012068006c00011d03001c0001dc00690000045e01000400000000000000000000056400010400030c0000004000011e400080000119`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408040200001c00010a006400f4016400000400000000000000000000000000050000046c0000000400011b04000800011d08000c00011e10001400012014001800012218001c00012420002400012524002800012428002c00011d40004400011b44004800011d48004c00011e50005400012054005800012258005c00012460006400012564006800012768006c00012903001c0001dc00690000045e0100040000000000000000000005640001040003300000001000011e10002000012020003000011930004000011d40005000011b500060000120600070000119700080000114`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408040200001c00010a006400f401640000040000000000000000000000000005000004960000000400011b04000800011d08000c00011e10001400012014001800012218001c00012420002400012524002800012428002c00011d40004400011b44004800011948004c00011d4c005000011b50005400011e54005800011d58005c0001225c006000012060006400012464006800012268006c0001256c007000012470007400012774007800012578007c0001297c008000012a03001c0001dc00690000045e01000400000000000000000000056400010400031e0000001000011e10002000012020004000011940006000011b60008000011e`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408040200001c00010a006400f401640000040000000000000000000000000005000004720000000400012910001400012920002400012924002800012928002c0001292c003000012930003400012940004400012248004c0001224c005000012250005400012458005c0001245c006000012460006400012268006c0001226c007000012270007400012778007c0001277c008000012703001c0001dc00690000045e01000400000000000000000000056400010400031e0000003400011d40005000012250006000011e600070000122700080000124`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408040200001c00010a006400f401640000040000000000000000000000000005000004900000000400012908000c0001290c001000012910001400012518001c0001251c002000012520002400012028002c0001202c003000012030003400011d38003c00011d3c004000011d40004400012248004c0001224c005000012250005400012458005c0001245c006000012460006400012268006c0001226c007000012270007400012778007c0001277c008000012703001c0001dc00690000045e0100040000000000000000000005640001040003300000001000012510002000012020003000011d30004000011940005000012250006000011e600070000122700080000124`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408020200001c00010a006400f4016400000400000000000000000000000000050000043c0000000400012908000c0001290c001000012910001400012518001c0001251c002000012520002400012028002c0001202c003000012030003400011d03001c0001dc00690000045e0100040000000000000000000005640001040003180000001000012510002000012020003000011930004000011d`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408040200001c00010a006400f4016400000400000000000000000000000000050000046c0000000400011b04000800011d08000c00011e10001400012014001800012218001c00012420002400012524002800012428002c00011d40004400011b44004800011d48004c00011e50005400012054005800012258005c00012460006400012564006800012768006c00012903001c0001dc00690000045e0100040000000000000000000005640001040003300000001000011e10002000012020003000011930004000011d40005000011b500060000120600070000119700080000114`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408040200001c00010a006400f401640000040000000000000000000000000005000004960000000400011b04000800011d08000c00011e10001400012014001800012218001c00012420002400012524002800012428002c00011d40004400011b44004800011948004c00011d4c005000011b50005400011e54005800011d58005c0001225c006000012060006400012464006800012268006c0001256c007000012470007400012774007800012578007c0001297c008000012a03001c0001dc00690000045e01000400000000000000000000056400010400031e0000001000011e10002000012020004000011940006000011b60008000011e`), music.PlaybackMode.UntilDone)
+    music.play(music.createSong(hex`0078000408020200001c00010a006400f4016400000400000000000000000000000000050000042a0000000400012910001400012920002400012924002800012928002c0001292c003000012930003400012903001c0001dc00690000045e0100040000000000000000000005640001040003060000003400011d`), music.PlaybackMode.UntilDone)
 })
