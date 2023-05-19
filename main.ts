@@ -1,5 +1,6 @@
 namespace SpriteKind {
     export const Weapon = SpriteKind.create()
+    export const Boss = SpriteKind.create()
 }
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     Attack_mode = 1
@@ -98,7 +99,7 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     Link_direction_right = 0
 })
 function Intro_Screen () {
-    info.setLife(5)
+    info.setLife(10)
     sprites.destroy(Link_Intro)
     tiles.setCurrentTilemap(tilemap`level1`)
     scene.setBackgroundImage(img`
@@ -456,6 +457,35 @@ function Intro_Screen () {
     Skeleton.follow(Link, 50)
     Skeleton2.follow(Link, 50)
     Skeleton3.follow(Link, 50)
+    Boss_monster = sprites.create(img`
+        ........................
+        ........................
+        ..........ccc...........
+        .........cccc...........
+        .....ccccccc..ccc.......
+        ...cc555555cccccc.......
+        ..c5555555555bcc........
+        .c555555555555b..cc.....
+        c555551ff555555bccc.....
+        c55d55ff55555555bc......
+        c5555555555555555b......
+        .cbb31bb5555dd555b.cc...
+        .c5333b555ddddd55dccc...
+        .c533b55ddddddddddb.....
+        .c5555dddbb55bdddddccc..
+        ..ccccbbbb555bdddddccc..
+        ...cdcbc5555bddddddcc...
+        ....ccbc55bc5ddddddbcccc
+        .....cbbcc5555dddddddddc
+        .....ccbbb555ddbddddddc.
+        .....cdcbc55ddbbbdddcc..
+        ...ccdddccddddbcbbcc....
+        ...ccccccd555ddccc......
+        ........cccccccc........
+        `, SpriteKind.Boss)
+    tiles.placeOnTile(Boss_monster, tiles.getTileLocation(151, 9))
+    Boss_monster.follow(Link, 25)
+    Boss_monster.ay = -100
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     Link.setImage(img`
@@ -510,6 +540,9 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Weapon, function (sprite, otherS
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.InBackground)
     Link_Has_Bow_Arrow = 1
 })
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
+    sprites.destroy(otherSprite, effects.spray, 500)
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     if (Attack_mode == 1) {
         sprites.destroy(otherSprite)
@@ -519,6 +552,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         pause(1000)
     }
 })
+let Boss_monster: Sprite = null
 let Skeleton3: Sprite = null
 let Skeleton2: Sprite = null
 let Skeleton: Sprite = null
