@@ -510,7 +510,7 @@ function Intro_Screen () {
         ................................................
         ................................................
         `, SpriteKind.Boss)
-    tiles.placeOnTile(Boss_monster, tiles.getTileLocation(151, 15))
+    tiles.placeOnTile(Boss_monster, tiles.getTileLocation(151, 5))
     Boss_monster.follow(Link, 25)
     Boss_monster.ay = 500
 }
@@ -572,8 +572,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         sprites.destroy(otherSprite)
         info.changeScoreBy(1)
     } else {
-        info.changeLifeBy(-1)
-        pause(1000)
+    	
     }
 })
 let Boss_monster: Sprite = null
