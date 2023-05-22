@@ -572,7 +572,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         sprites.destroy(otherSprite)
         info.changeScoreBy(1)
     } else {
-    	
+        info.changeLifeBy(-1)
+        pause(1000)
     }
 })
 let Boss_monster: Sprite = null
